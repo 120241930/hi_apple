@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Christmas Apple Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a1a;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .apple-container {
+            position: relative;
+            cursor: pointer;
+            width: 120px;
+            height: 120px;
+        }
+
+        .apple {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ff1e1e, #d10000);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: inset -10px -10px 15px rgba(0,0,0,0.2),
+                       inset 5px 5px 15px rgba(255,255,255,0.2);
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .apple::before { /* 叶子 */
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            width: 20px;
+            height: 30px;
+            background: #4CAF50;
+            border-radius: 0 30px 0 30px;
+            transform: translateX(-50%) rotate(-30deg);
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2);
+        }
+
+        .apple::after { /* 茎 */
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            width: 4px;
+            height: 15px;
+            background: #795548;
+            transform: translateX(-50%);
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* 苹果上的光泽 */
+        .apple .shine {
+            position: absolute;
+            top: 25%;
+            left: 20%;
+            width: 20px;
+            height: 10px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            transform: rotate(40deg);
+        }
+
+        .heart {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 80px;
+            background: #ff3366;
+            border-radius: 50px 50px 0 0;
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.2);
+        }
+
+        .heart::before {
+            left: 50px;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .heart::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle at 30% 30%, #ff6b6b, #ff1e1e);
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .apple-container.exploded .apple {
+            animation: explode 0.5s forwards;
+        }
+
+        .apple-container.exploded .heart {
+            animation: showHeart 0.5s 0.5s forwards;
+        }
+
+        .apple-container.exploded .particle {
+            animation: particleExplode 1s forwards;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        @keyframes showHeart {
+            0% { 
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes particleExplode {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="apple-container" onclick="explode(this)">
+        <div class="apple">
+            <div class="shine"></div>
+        </div>
+        <div class="heart"></div>
+    </div>
+
+    <script>
+        function explode(container) {
+            if (container.classList.contains('exploded')) return;
+            
+            container.classList.add('exploded');
+
+            // 创建粒子效果
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // 随机生成粒子的运动方向
+                const angle = (i / 15) * 360 + Math.random() * 20;
+                const distance = 100 + Math.random() * 60;
+                const tx = Math.cos(angle * Math.PI / 180) * distance;
+                const ty = Math.sin(angle * Math.PI / 180) * distance;
+                
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+                
+                container.appendChild(particle);
+            }
+
+            // 3秒后重置动画
+            setTimeout(() => {
+                container.classList.remove('exploded');
+                const particles = container.querySelectorAll('.particle');
+                particles.forEach(p => p.remove());
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
